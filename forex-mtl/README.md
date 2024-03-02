@@ -22,6 +22,18 @@ Paidy engineers can access this service via `GET /forex-rates`.
 ### High Level Design
 TODO
 
+### Querying and storing the data from the One-Frame API
+To be as efficient as possible with each request to the One-Frame API, we want to include all **combinations** (as opposed to permutations) of rate pairs in the query parameters. In other words:
+```
+# Combination (this is what we want)
+/rates?pair=USDJPY
+
+# Permutation (this is not what we want)
+/rates?pair=USDJPY&pair=JPYUSD
+```
+
+We can then store the rates in both directions (i.e. USD to JPY and JPY to USD) (see Implementation).
+
 ### Why Redis?
 The reasons to choose Redis are the following:
 * **Extremely fast reads.** If the requirements increase from 10,000 requests, then Redis will be able
