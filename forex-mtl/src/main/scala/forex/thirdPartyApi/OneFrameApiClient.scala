@@ -1,4 +1,4 @@
-package forex.http.client
+package forex.thirdPartyApi
 
 import io.circe.Codec
 import io.circe.generic.semiauto.deriveCodec
@@ -12,12 +12,8 @@ object RateDto {
 }
 
 
-class OneFrameClient {
-  def get()  = {
-		this.getResponse()
-	}
-	
-  private def getResponse(): List[RateDto] = {
+class OneFrameApiClient {
+  def get(): List[RateDto] = {
 		// TODO: delete and connect to API. Debug use only
     val jsonResponse = """[{"from":"USD","to":"JPY","bid":0.61,"ask":0.82,"price":0.71,"time_stamp":"2019-01-01T00:00:00.000"}]"""
 		
