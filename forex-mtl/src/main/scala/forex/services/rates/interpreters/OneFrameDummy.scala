@@ -2,20 +2,24 @@ package forex.services.rates.interpreters
 
 import forex.services.rates.Algebra
 import cats.Applicative
-import cats.syntax.applicative._
-import cats.syntax.either._
 import forex.domain.{ Price, Rate, Timestamp }
 import forex.services.rates.errors._
 import forex.thirdPartyApi.OneFrameApiClient
+import java.time.OffsetDateTime
 
 class OneFrameDummy[F[_]: Applicative](val client: OneFrameApiClient) extends Algebra[F] {
   override def get(pair: Rate.Pair): F[Error Either Rate] = {
     // check if result is in cache
     // if not, make http request, save result to cache and return Rate
     val rates = this.client.get()
-    print(rates)
+    val rateDto = rates.get(pair)
+        
+    val rate = rateDto match {
+      case None => Left(Error.OneFrameLookupFailed("Rate not found"))
+      case Some(r) => Right(Rate(pair, Price(r.price),Timestamp(OffsetDateTime.parse(r.time_stamp))))
+    }
 
-    return Rate(pair, Price(BigDecimal(100)), Timestamp.now).asRight[Error].pure[F]
+    return Applicative[F].pure(rate)
   }
 
 }

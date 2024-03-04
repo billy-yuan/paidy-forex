@@ -8,7 +8,7 @@ import forex.domain.Currency
 import scala.collection.immutable.HashMap
 
 
-final case class RateDto(from: String, to: String, bid: Float, ask: Float, price: Float, time_stamp: String)
+final case class RateDto(from: String, to: String, bid: BigDecimal, ask: BigDecimal, price: BigDecimal, time_stamp: String)
 
 object RateDto {
   implicit final val RateDtoCodec: Codec[RateDto] = deriveCodec
@@ -17,7 +17,7 @@ object RateDto {
 class OneFrameApiClient {
   def get(): Map[Rate.Pair, RateDto] = {
 	// TODO: delete and connect to API. Debug use only
-    val jsonResponse = """[{"from":"USD","to":"JPY","bid":0.61,"ask":0.82,"price":0.71,"time_stamp":"2019-01-01T00:00:00.000"}]"""
+    val jsonResponse = """[{"from":"USD","to":"JPY","bid":0.6118225421857174,"ask":0.8243869101616611,"price":0.71810472617368925,"time_stamp":"2022-01-11T07:47:40.734Z"}]"""
 		
 	val rateDtos = decode[List[RateDto]](jsonResponse) match {
 		case Right(i) => i
