@@ -39,4 +39,5 @@ object Currency {
     case "USD" => USD
   }
 
+  def cases(): Set[Currency] = Set(AUD, CAD, CHF, EUR, GBP, NZD, JPY, SGD, USD)
 }

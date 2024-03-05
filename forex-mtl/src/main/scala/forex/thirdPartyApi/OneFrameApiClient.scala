@@ -6,7 +6,8 @@ import io.circe.parser.decode
 import forex.domain.Rate
 import forex.domain.Currency
 import scala.collection.immutable.HashMap
-
+import sttp.client4.quick._
+import sttp.model.Uri
 
 final case class RateDto(from: String, to: String, bid: BigDecimal, ask: BigDecimal, price: BigDecimal, time_stamp: String)
 
@@ -16,10 +17,18 @@ object RateDto {
 
 class OneFrameApiClient {
   def get(): Map[Rate.Pair, RateDto] = {
-	// TODO: delete and connect to API. Debug use only
-    val jsonResponse = """[{"from":"USD","to":"JPY","bid":0.6118225421857174,"ask":0.8243869101616611,"price":0.71810472617368925,"time_stamp":"2022-01-11T07:47:40.734Z"}]"""
+	// Build URL and add currency pairs as query parameters 
+	var url: Uri = endpoint.get()
+	this.getCurrencyPairs()
+	.foreach((pair) => {
+		url = url.addParam("pair", pair.from.toString() + pair.to.toString())
+	})
+
+	// Send request
+	val response = quickRequest.get(url).header("token","10dc303535874aeccc86a8251e6992f5").send()
 		
-	val rateDtos = decode[List[RateDto]](jsonResponse) match {
+	// Convert response body to RateDtos
+	val rateDtos = decode[List[RateDto]](response.body) match {
 		case Right(i) => i
 		case Left(_) => List()
 	}
@@ -32,5 +41,15 @@ class OneFrameApiClient {
 	}
 
 	return rateMap
+  }
+
+  private def getCurrencyPairs(): Set[Rate.Pair] = {
+	val allCurrencies: Set[(Currency, Int)] = Currency.cases().zipWithIndex
+	val pairs: Set[Rate.Pair] = for {
+  		(c1, i) <- allCurrencies
+  		(c2, j) <- allCurrencies if i != j
+	} yield (Rate.Pair(c1,c2))
+
+	return pairs
   }
 }
