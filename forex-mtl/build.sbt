@@ -63,6 +63,7 @@ libraryDependencies ++= Seq(
   Libraries.circeParser,
   Libraries.pureConfig,
   Libraries.logback,
+  Libraries.scalaRedis,
   Libraries.sttpClient,
   Libraries.scalaTest      % Test,
   Libraries.scalaCheck     % Test,

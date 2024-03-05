@@ -12,6 +12,7 @@ object Dependencies {
 
     val kindProjector  = "0.13.2"
     val logback        = "1.2.3"
+    val scalaRedis     = "3.41"
     val scalaCheck     = "1.15.3"
     val scalaTest      = "3.2.7"
     val sttp           = "4.0.0-M1"
@@ -34,6 +35,7 @@ object Dependencies {
     lazy val circeGenericExt = circe("circe-generic-extras")
     lazy val circeParser     = circe("circe-parser")
     lazy val pureConfig      = "com.github.pureconfig" %% "pureconfig" % Versions.pureConfig
+    lazy val scalaRedis      = "net.debasishg" %% "redisclient" % Versions.scalaRedis
     lazy val sttpClient            = "com.softwaremill.sttp.client4" %% "core" % Versions.sttp
 
     // Compiler plugins
