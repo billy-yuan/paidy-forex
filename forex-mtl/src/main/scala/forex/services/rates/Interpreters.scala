@@ -2,7 +2,7 @@ package forex.services.rates
 
 import cats.Applicative
 import interpreters._
-import forex.thirdPartyApi.OneFrameApiClient
+import forex.thirdPartyApi.oneFrame.OneFrameApiClient
 
 object Interpreters {
   def dummy[F[_]: Applicative]: Algebra[F] = {

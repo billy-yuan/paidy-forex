@@ -4,7 +4,7 @@ import forex.services.rates.Algebra
 import cats.Applicative
 import forex.domain.Rate
 import forex.services.rates.errors._
-import forex.thirdPartyApi.OneFrameApiClient
+import forex.thirdPartyApi.oneFrame.OneFrameApiClient
 
 class OneFrameDummy[F[_]: Applicative](val client: OneFrameApiClient) extends Algebra[F] {
   override def get(pair: Rate.Pair): F[Error Either Rate] = {

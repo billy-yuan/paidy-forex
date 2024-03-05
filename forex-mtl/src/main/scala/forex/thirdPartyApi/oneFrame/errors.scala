@@ -1,4 +1,4 @@
-package forex.thirdPartyApi
+package forex.thirdPartyApi.oneFrame
 
 object errors {
 

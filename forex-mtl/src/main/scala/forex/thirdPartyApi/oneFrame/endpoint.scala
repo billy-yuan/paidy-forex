@@ -1,4 +1,4 @@
-package forex.thirdPartyApi
+package forex.thirdPartyApi.oneFrame
 
 import sttp.model.Uri
 import sttp.client4.quick._

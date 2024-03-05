@@ -1,4 +1,4 @@
-package forex.thirdPartyApi
+package forex.thirdPartyApi.oneFrame
 
 import io.circe.Codec
 import io.circe.generic.semiauto.deriveCodec
