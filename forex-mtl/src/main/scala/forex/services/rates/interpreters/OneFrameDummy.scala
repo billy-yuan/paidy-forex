@@ -2,10 +2,9 @@ package forex.services.rates.interpreters
 
 import forex.services.rates.Algebra
 import cats.Applicative
-import forex.domain.{ Price, Rate, Timestamp }
+import forex.domain.Rate
 import forex.services.rates.errors._
 import forex.thirdPartyApi.OneFrameApiClient
-import java.time.OffsetDateTime
 
 class OneFrameDummy[F[_]: Applicative](val client: OneFrameApiClient) extends Algebra[F] {
   override def get(pair: Rate.Pair): F[Error Either Rate] = {
@@ -16,7 +15,7 @@ class OneFrameDummy[F[_]: Applicative](val client: OneFrameApiClient) extends Al
         
     val rate = rateDto match {
       case None => Left(Error.OneFrameLookupFailed("Rate not found"))
-      case Some(r) => Right(Rate(pair, Price(r.price),Timestamp(OffsetDateTime.parse(r.time_stamp))))
+      case Some(r) => Right(r)
     }
 
     return Applicative[F].pure(rate)
