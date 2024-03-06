@@ -6,7 +6,7 @@ import scala.concurrent.duration._
 import forex.domain.Rate
 
 package object infrastructure {
-  val scaffiene =
+  private val scaffiene =
       Scaffeine()
         .recordStats()
         .expireAfterWrite(3.minute)
