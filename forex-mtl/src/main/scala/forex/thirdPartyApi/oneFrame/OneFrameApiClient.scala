@@ -10,7 +10,6 @@ import forex.domain.Timestamp
 import scala.collection.immutable.HashMap
 import sttp.client4.quick._
 import sttp.model.Uri
-import java.time.OffsetDateTime
 import errors._
 
 final case class RateDto(from: String, to: String, bid: BigDecimal, ask: BigDecimal, price: BigDecimal, time_stamp: String)
@@ -43,7 +42,7 @@ class OneFrameApiClient {
 	var rateMap: Map[Rate.Pair, Rate] = new HashMap()
 	for (rateDto <- rateDtos) {
 		val ratePair = Rate.Pair(Currency.fromString(rateDto.from), Currency.fromString(rateDto.to))
-		val rate = Rate(ratePair, Price(rateDto.price), Timestamp(OffsetDateTime.parse(rateDto.time_stamp)))
+		val rate = Rate(ratePair, Price(rateDto.price), Timestamp.fromString(rateDto.time_stamp))
 		rateMap = rateMap + (ratePair -> rate)
 	}
 
