@@ -65,6 +65,9 @@ Therefore, we will use **3 minutes** as the cache expiration.
 
 ### Make service instansiations cleaner with dependency injection
 
+### Add logging
+To help with debugging, a logger that sends an error log with a stack trace can be implemented whenever an exception occurs.
+
 ## Limitations 
 ### Caffiene is in-memory and cannot be used by multiple instances
 If more than one instance of this service is spun up, then each instance will have its own separate cache. Because the caches do not share data, they each need to fetch data using the OneFrame API client once its data expires. This will increase the number of API requests.
