@@ -1,21 +1,24 @@
 package forex.infrastructure.cache
 
-import com.github.blemale.scaffeine.Scaffeine
-import scala.concurrent.duration._
 import forex.services.rates.RatesCache
 import forex.domain.Rate
+import com.github.blemale.scaffeine.Cache
 
-class RatesCacheCaffiene extends RatesCache {
+class RatesCacheCaffiene(val cache: Cache[String, Rate]) extends RatesCache {
   override def get(pair: Rate.Pair): Option[Rate] = {
-    // TODO: move cache creation outside
-    val cache =
-      Scaffeine()
-        .recordStats()
-        .expireAfterWrite(3.minute)
-        .maximumSize(100)
-        .build[String, Rate]()
-
     return cache.getIfPresent(this.getKey(pair))
+  }
+
+  override def setAll(rates: Set[Rate]): Unit = {
+    // var values: Map[String, Rate] = Map()
+
+    println("Setting")
+    for (rate <- rates) {
+      cache.put(getKey(rate.pair), rate)
+      // values = values + (getKey(rate.pair) -> rate)
+    }
+
+    // cache.putAll(values)
   }
 
   private def getKey(pair: Rate.Pair): String = {

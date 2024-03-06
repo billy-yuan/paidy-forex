@@ -5,6 +5,8 @@ import forex.infrastructure.ratesCacheCaffiene
 
 trait RatesCache {
   def get(pair: Rate.Pair): Option[Rate]
+
+  def setAll(rates: Set[Rate]): Unit
 }
 
 object RatesCache {
