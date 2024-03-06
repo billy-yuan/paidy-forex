@@ -9,7 +9,7 @@ import forex.services.rates.errors.Error.OneFrameLookupFailed
 import forex.thirdPartyApi.oneFrame.OneFrameApiClient
 import forex.services.rates.RatesCache
 
-class OneFrameDummy[F[_]: Applicative](oneFrameApiClient: OneFrameApiClient, ratesCache: RatesCache) extends Algebra[F] {
+class OneFrameInterpreter[F[_]: Applicative](oneFrameApiClient: OneFrameApiClient, ratesCache: RatesCache) extends Algebra[F] {
   override def get(pair: Rate.Pair): F[Error Either Rate] = {
     val cacheResult = ratesCache.get(pair)
 
