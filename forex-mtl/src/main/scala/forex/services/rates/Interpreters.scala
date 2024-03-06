@@ -5,5 +5,5 @@ import interpreters._
 import forex.thirdPartyApi.oneFrameApiClient
 
 object Interpreters {
-  def dummy[F[_]: Applicative]: Algebra[F] = new OneFrameInterpreter[F](oneFrameApiClient, RatesCache.ratesCache)
+  def oneFrame[F[_]: Applicative]: Algebra[F] = new OneFrameInterpreter[F](oneFrameApiClient, RatesCache.ratesCache)
 }
