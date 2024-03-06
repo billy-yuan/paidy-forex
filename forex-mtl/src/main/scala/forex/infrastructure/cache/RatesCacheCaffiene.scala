@@ -6,7 +6,7 @@ import com.github.blemale.scaffeine.Cache
 
 class RatesCacheCaffiene(val cache: Cache[String, Rate]) extends RatesCache {
   override def get(pair: Rate.Pair): Option[Rate] = {
-    return cache.getIfPresent(this.getKey(pair))
+    return cache.getIfPresent(getKey(pair))
   }
 
   override def setAll(rates: Set[Rate]): Unit = {
