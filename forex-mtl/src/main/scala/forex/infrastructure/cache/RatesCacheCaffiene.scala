@@ -10,15 +10,13 @@ class RatesCacheCaffiene(val cache: Cache[String, Rate]) extends RatesCache {
   }
 
   override def setAll(rates: Set[Rate]): Unit = {
-    // var values: Map[String, Rate] = Map()
+    var values: Map[String, Rate] = Map()
 
-    println("Setting")
     for (rate <- rates) {
-      cache.put(getKey(rate.pair), rate)
-      // values = values + (getKey(rate.pair) -> rate)
+      values = values + (getKey(rate.pair) -> rate)
     }
 
-    // cache.putAll(values)
+    cache.putAll(values)
   }
 
   private def getKey(pair: Rate.Pair): String = {
