@@ -6,9 +6,9 @@ import forex.domain.Rate
 import forex.services.rates.errors._
 import forex.thirdPartyApi.oneFrame.errors._
 import forex.services.rates.errors.Error.OneFrameLookupFailed
-import forex.thirdPartyApi.oneFrameApiClient
+import forex.thirdPartyApi.oneFrame.OneFrameApiClient
 
-class OneFrameDummy[F[_]: Applicative] extends Algebra[F] {
+class OneFrameDummy[F[_]: Applicative](oneFrameApiClient: OneFrameApiClient) extends Algebra[F] {
   override def get(pair: Rate.Pair): F[Error Either Rate] = {
     // check if result is in cache
     // if not, make http request, save result to cache and return Rate
