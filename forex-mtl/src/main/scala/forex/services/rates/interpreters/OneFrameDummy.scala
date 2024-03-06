@@ -7,9 +7,9 @@ import forex.services.rates.errors._
 import forex.thirdPartyApi.oneFrame.errors._
 import forex.services.rates.errors.Error.OneFrameLookupFailed
 import forex.thirdPartyApi.oneFrame.OneFrameApiClient
-import forex.services.rates.RatesCache.ratesCache
+import forex.services.rates.RatesCache
 
-class OneFrameDummy[F[_]: Applicative](oneFrameApiClient: OneFrameApiClient) extends Algebra[F] {
+class OneFrameDummy[F[_]: Applicative](oneFrameApiClient: OneFrameApiClient, ratesCache: RatesCache) extends Algebra[F] {
   override def get(pair: Rate.Pair): F[Error Either Rate] = {
     val cacheResult = ratesCache.get(pair)
 
@@ -22,7 +22,7 @@ class OneFrameDummy[F[_]: Applicative](oneFrameApiClient: OneFrameApiClient) ext
   }
 
   private def getFromApi(pair: Rate.Pair): Either[Error, Rate] = {
-       val ratesFromClient: Either[OneFrameApiClientError, Map[Rate.Pair, Rate]] = oneFrameApiClient.getAll()
+      val ratesFromClient: Either[OneFrameApiClientError, Map[Rate.Pair, Rate]] = oneFrameApiClient.getAll()
 
       val rateFromMap: Either[Error, Option[Rate]] = ratesFromClient match {
         case Left(_) => Left(OneFrameLookupFailed("Error with getting response from OneFrameApiClient")) 
