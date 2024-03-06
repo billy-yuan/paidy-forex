@@ -22,14 +22,14 @@ object RateDto {
 class OneFrameApiClient {
   def getAll(): Either[OneFrameApiClientError, Map[Rate.Pair, Rate]] = {
 	// Build URL and add currency pairs as query parameters 
-	var url: Uri = endpoint.get()
+	var url: Uri = config.endpoint.get()
 	this.getCurrencyPairs()
 	.foreach((pair) => {
 		url = url.addParam("pair", pair.from.toString() + pair.to.toString())
 	})
 
 	// Send request
-	val response = quickRequest.get(url).header("token","10dc303535874aeccc86a8251e6992f5").send()
+	val response = quickRequest.get(url).header("token", config.token.get()).send()
 		
 	// Convert response body to RateDtos
 	val rateDtos = decode[List[RateDto]](response.body) match {
