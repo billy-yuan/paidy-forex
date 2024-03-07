@@ -26,9 +26,16 @@ class RatesHttpRoutes[F[_]: Sync](rates: RatesProgram[F]) extends Http4sDsl[F] {
             case Invalid(e) => BadRequest(Protocol.GetApiError(ErrorType.InvalidRate, e.head.sanitized))
             case Valid(to) =>
               rates
-              .get(RatesProgramProtocol.GetRatesRequest(from, to))
-              .flatMap(Sync[F].fromEither)
-              .flatMap { rate => Ok(rate.asGetApiResponse)}
+                .get(RatesProgramProtocol.GetRatesRequest(from, to))
+                .flatMap { rate => 
+                  rate match {
+                    case Left(_) => 
+                      InternalServerError(Protocol.GetApiError(
+                        ErrorType.InterpreterError, "Error has occurred. Please try again later."
+                      ))
+                    case Right(value) => Ok(value.asGetApiResponse)
+                  }
+                }
           }
       }
 
