@@ -20,12 +20,15 @@ class RatesHttpRoutes[F[_]: Sync](rates: RatesProgram[F]) extends Http4sDsl[F] {
   private val httpRoutes: HttpRoutes[F] = HttpRoutes.of[F] {
     case GET -> Root :? FromQueryParam(maybeFrom) +& ToQueryParam(maybeTo) =>
       maybeFrom match {
-        case Invalid(_) => BadRequest("TODO: Invalid from JSON")
+        case Invalid(e) => BadRequest(Protocol.GetApiError(ErrorType.InvalidRate, e.head.sanitized))
         case Valid(from) => 
           maybeTo match {
-            case Invalid(_) => BadRequest("TODO: Invalid to JSON")
+            case Invalid(e) => BadRequest(Protocol.GetApiError(ErrorType.InvalidRate, e.head.sanitized))
             case Valid(to) =>
-              rates.get(RatesProgramProtocol.GetRatesRequest(from, to)).flatMap(Sync[F].fromEither).flatMap { rate => Ok(rate.asGetApiResponse)}
+              rates
+              .get(RatesProgramProtocol.GetRatesRequest(from, to))
+              .flatMap(Sync[F].fromEither)
+              .flatMap { rate => Ok(rate.asGetApiResponse)}
           }
       }
 

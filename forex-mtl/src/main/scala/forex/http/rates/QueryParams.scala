@@ -10,7 +10,7 @@ object QueryParams {
   private[http] implicit val currencyQueryParam: QueryParamDecoder[Currency] =
     QueryParamDecoder[String].emap((q) => {
       Currency.tryFromString(q) match {
-        case None =>  Left(ParseFailure(s"$q is not a valid currency.", ""))
+        case None =>  Left(ParseFailure(s"$q is not a valid currency.", s"$q is not a valid currency."))
         case Some(value) => Right(value)
       }
     }
