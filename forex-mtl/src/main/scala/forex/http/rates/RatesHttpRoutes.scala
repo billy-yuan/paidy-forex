@@ -25,7 +25,14 @@ class RatesHttpRoutes[F[_]: Sync](rates: RatesProgram[F]) extends Http4sDsl[F] {
           maybeTo match {
             case Invalid(_) => BadRequest("TODO: Invalid to JSON")
             case Valid(to) =>
-              rates.get(RatesProgramProtocol.GetRatesRequest(from, to)).flatMap(Sync[F].fromEither).flatMap { rate => Ok(rate.asGetApiResponse)}
+              rates.get(RatesProgramProtocol.GetRatesRequest(from, to)).flatMap {
+                value => 
+                  value match {
+                    case Left(_) => BadRequest("d")
+                    case Right(value) => Ok(value.asGetApiResponse)
+                  }
+              }
+              
           }
       }
 
