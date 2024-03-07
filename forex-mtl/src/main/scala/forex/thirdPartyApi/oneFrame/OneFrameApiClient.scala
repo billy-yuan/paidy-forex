@@ -31,31 +31,33 @@ class OneFrameApiClient {
 	val response = quickRequest.get(url).header("token", config.token.get()).send()
 		
 	// Convert response body to RateDtos
-	val rateDtos = decode[List[RateDto]](response.body) match {
-		case Right(i) => i
-		case Left(_) => List()
+	val maybeRateDtos = decode[List[RateDto]](response.body) match {
+		case Left(_) => Left(errors.OneFrameApiClientError.JsonDecodingError("Error decoding JSON"))
+		case Right(i) => Right(i)
 	}
 
-	if (rateDtos.isEmpty) Left(errors.OneFrameApiClientError.JsonDecodingError("Error decoding JSON"))
-
-	// Convert list to map
 	var rateMap: Map[Rate.Pair, Rate] = new HashMap()
-	for (rateDto <- rateDtos) {
-		val ratePair = Rate.Pair(Currency.fromString(rateDto.from), Currency.fromString(rateDto.to))
-		val rate = Rate(ratePair, Price(rateDto.price), Timestamp.fromString(rateDto.time_stamp))
-		rateMap = rateMap + (ratePair -> rate)
-	}
 
-	return Right(rateMap)
+	maybeRateDtos.fold(
+		e => Left(e),
+		rateDtos => {
+			for (rateDto <- rateDtos) {
+				val ratePair = Rate.Pair(Currency.fromString(rateDto.from), Currency.fromString(rateDto.to))
+				val rate = Rate(ratePair, Price(rateDto.price), Timestamp.fromString(rateDto.time_stamp))
+				rateMap = rateMap + (ratePair -> rate)
+			}
+			Right(rateMap)
+		}
+		)
   }
 
   private def getCurrencyPairs(): Set[Rate.Pair] = {
-	val allCurrencies: Set[(Currency, Int)] = Currency.cases().zipWithIndex
-	val pairs: Set[Rate.Pair] = for {
+		val allCurrencies: Set[(Currency, Int)] = Currency.cases().zipWithIndex
+		val pairs: Set[Rate.Pair] = for {
   		(c1, i) <- allCurrencies
   		(c2, j) <- allCurrencies if i != j
-	} yield (Rate.Pair(c1,c2))
+		} yield (Rate.Pair(c1,c2))
 
-	return pairs
+		return pairs
   }
 }
