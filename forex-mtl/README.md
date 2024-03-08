@@ -14,7 +14,7 @@ Because the number of the requests the Forex service must support is greater tha
 Instead, we can do the following:
 
 * Send a request to the One-Frame API with all pair combinations as query parameters.
-* Store the rates from the One-Frame API in a cache (e.g. Redis) and fulfill Forex requests by querying this storage. 
+* Store the rates from the One-Frame API in a cache and fulfill Forex requests by querying this storage. 
 * Whenever the results go stale, get the latest rates from the One-Frame API and update the cache.
 
 Paidy engineers can access this service via `GET /forex-rates`.
@@ -22,7 +22,34 @@ Paidy engineers can access this service via `GET /forex-rates`.
 ### High Level Design
 TODO
 
-### Querying and storing the data from the One-Frame API
+## API Responses
+Success
+```
+{
+  "from":"USD",
+  "to":"JPY",
+  "price":0.39625560098102343,
+  "timestamp":"2024-03-08T23:44:04.16Z"
+}
+```
+
+### Error
+Example
+```
+{
+   "error":"invalid_rate",
+   "message":"JPYd is not a valid currency."
+}
+```
+
+#### error
+* `invalid_rate`: query parameter contains an unsupported rate.
+* `interpreter_error`: server error (likely due to a bug)
+
+#### message
+Contains details regarding the error.
+
+### Minimizing rounding errors
 To minimize rounding errors that occurs from taking inverses of currency exchange rates (i.e. if 1 USD = 150.3 yen, the inverse is 1 yen = 1/150.3), we want to include all **permutations** of rate pairs in the query parameters. In other words:
 ```
 /rates?pair=USDJPY&pair=JPYUSD
@@ -51,28 +78,28 @@ Now, we can theoretically set the cache expiration time to 5 minutes. However, d
 
 Therefore, we will use **3 minutes** as the cache expiration.
 
-## Implementation
-
 ### Edge cases
 
+#### Rate is not supported by OneFrame API
+If a currency in `forex.domain.Currency` is not supported by the One Frame API, then unfortunately the request will fail. However, third party API changes should be prepared for well in advance. If this occurs, I have set up logging so that this issue is easy to detect.
+
 #### Number of supported currencies increases
+Currently, there are 9 currencies supported, which means 72 pairs of currencies are sent to the One Frame API. If this increases, then the number of pairs will increase exponentially and the URL may become too long to handle in single request.
 
-#### Database goes down
-
-#### Maximum daily requests per API token decreases
-
-## Improvements
-
-### Make service instansiations cleaner with dependency injection
-
-### Add logging
-To help with debugging, a logger that sends an error log with a stack trace can be implemented whenever an exception occurs.
+If this requirement change happens, then we will have to*
+* Get all rates from the OneFrame API in multiple requests (as opposed to a single request)
+* In order to stay within 1000 requests, we may need to possibly increase the SLA from 5 minutes since the number of requests to the OneFrame API will increase
 
 ## Limitations 
 ### Caffiene is in-memory and cannot be used by multiple instances
 If more than one instance of this service is spun up, then each instance will have its own separate cache. Because the caches do not share data, they each need to fetch data using the OneFrame API client once its data expires. This will increase the number of API requests.
 
-To prevent this, a centralized cache can be used (like Redis) by all instances.
+To prevent both issues, a centralized cache can be used (like Redis) by all instances.
 
 ### Historical rates cannot be queried
 Because rates are stored in a cache and expire after 3 minutes, old rates cannot be queried. If this becomes a requirement in the future, then we can add this feature and save the rates to a database in addition to storing the data to a cache.
+
+## Improvements & final thoughts
+* Centralize service instansiations in one place using dependency injection.
+* Refactor deeply nested `match` blocks that handle monads (as this is my first time using Scala, the code I have written is not the most idiomatic)
+
