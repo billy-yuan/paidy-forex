@@ -7,6 +7,16 @@ import org.http4s.ParseFailure
 
 object QueryParams {
 
+  case class Params(from: Option[Currency], to: Option[Currency]) {}
+  case class ValidatedParams(from: Currency, to: Currency) {}
+
+  def validateParams(p: Params): Either[ParseFailure,ValidatedParams] = {
+    for {
+      from <- p.from.toRight(ParseFailure("failed to parse from", ""))
+      to <- p.to.toRight(ParseFailure("failed to parse to", ""))
+    } yield new ValidatedParams(from, to)
+  }
+
   private[http] implicit val currencyQueryParam: QueryParamDecoder[Currency] =
     QueryParamDecoder[String].emap((q) => {
       Currency.tryFromString(q) match {

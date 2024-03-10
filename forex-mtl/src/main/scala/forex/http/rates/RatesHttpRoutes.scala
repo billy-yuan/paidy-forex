@@ -8,8 +8,6 @@ import forex.programs.rates.{ Protocol => RatesProgramProtocol }
 import org.http4s.HttpRoutes
 import org.http4s.dsl.Http4sDsl
 import org.http4s.server.Router
-import cats.data.Validated.Invalid
-import cats.data.Validated.Valid
 
 class RatesHttpRoutes[F[_]: Sync](rates: RatesProgram[F]) extends Http4sDsl[F] {
 
@@ -19,27 +17,29 @@ class RatesHttpRoutes[F[_]: Sync](rates: RatesProgram[F]) extends Http4sDsl[F] {
 
   private val httpRoutes: HttpRoutes[F] = HttpRoutes.of[F] {
     case GET -> Root :? FromQueryParam(maybeFrom) +& ToQueryParam(maybeTo) =>
-      maybeFrom match {
-        case Invalid(e) => BadRequest(Protocol.GetApiError(ErrorType.InvalidRate, e.head.sanitized))
-        case Valid(from) => 
-          
-          maybeTo match {
-            case Invalid(e) => BadRequest(Protocol.GetApiError(ErrorType.InvalidRate, e.head.sanitized))
-            case Valid(to) =>
-              val maybeRate = rates.get(RatesProgramProtocol.GetRatesRequest(from, to))
-              
-              maybeRate.flatMap { r => 
-                r match {
-                  case Left(_) => 
+      
+      val validatedParams = validateParams(new Params(maybeFrom.toOption, maybeTo.toOption))
+      val maybeValidatedParams = validatedParams
+        .fold(
+          _ => Left(Protocol.GetApiError(ErrorType.InvalidRate, "Invalid rate")),
+          p => Right(p)
+        )
+
+      maybeValidatedParams match {
+        case Left(e) => BadRequest(e)
+        case Right(v) => {
+          val rate = rates.get(RatesProgramProtocol.GetRatesRequest(v.from, v.to))
+          rate.flatMap { r =>
+            r match {
+                case Left(_) => 
                     InternalServerError(Protocol.GetApiError(
                       ErrorType.InterpreterError, "Error has occurred. Please try again later."
                     ))
                   case Right(rate) => Ok(rate.asGetApiResponse)
-                }
               }
-            }
+          }
+        }
       }
-
   }
 
   val routes: HttpRoutes[F] = Router(
