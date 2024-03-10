@@ -13,16 +13,20 @@ Because the number of the requests the Forex service must support is greater tha
 
 Instead, we can do the following:
 
-* Send a request to the One-Frame API with all pair combinations as query parameters.
-* Store the rates from the One-Frame API in a cache and fulfill Forex requests by querying this storage. 
-* Whenever the results go stale, get the latest rates from the One-Frame API and update the cache.
+1. Send a request to the One-Frame API with all pair combinations as query parameters.
+2. Store the rates from the One-Frame API in a cache and fulfill Forex requests by querying this cache. 
+3. Whenever the results go stale, get the latest rates from the One-Frame API and update the cache (i.e. repeat step 1)
 
-Paidy engineers can access this service via `GET /forex-rates`.
+## API
 
-### High Level Design
-TODO
+Endpoint: `GET /rates`
+### Parameters
+* **`from`**: `string` Starting currency
+* **`to`**: `string` Ending currency
 
-## API Responses
+Example request: `GET /rates?from=USD&to=JPY`
+
+### Responses
 Success
 ```
 {
