@@ -18,10 +18,9 @@ class RatesHttpRoutes[F[_]: Sync](rates: RatesProgram[F]) extends Http4sDsl[F] {
   private val httpRoutes: HttpRoutes[F] = HttpRoutes.of[F] {
     case GET -> Root :? FromQueryParam(maybeFrom) +& ToQueryParam(maybeTo) =>
       
-      val validatedParams = validateParams(new Params(maybeFrom.toOption, maybeTo.toOption))
-      val maybeValidatedParams = validatedParams
+      val maybeValidatedParams = validateParams(new Params(maybeFrom.toOption, maybeTo.toOption))
         .fold(
-          _ => Left(Protocol.GetApiError(ErrorType.InvalidRate, "Invalid rate")),
+          e => Left(Protocol.GetApiError(ErrorType.InvalidRate, e.sanitized)),
           p => Right(p)
         )
 
