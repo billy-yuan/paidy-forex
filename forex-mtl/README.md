@@ -54,9 +54,9 @@ Example
 Contains details regarding the error.
 
 ### Http Status Summary
-* 200 OK
-* 400 The request was unacceptable, often due to missing a required parameter
-* 500 Something went wrong with the interpreter (usually a bug)
+* `200` OK
+* `400` The request was unacceptable, often due to missing a required parameter
+* `500` Something went wrong with the interpreter (usually a bug)
 
 ### Minimizing rounding errors
 To minimize rounding errors that occurs from taking inverses of currency exchange rates (i.e. if 1 USD = 150.3 yen, the inverse is 1 yen = 1/150.3), we want to include all **permutations** of rate pairs in the query parameters. In other words:
