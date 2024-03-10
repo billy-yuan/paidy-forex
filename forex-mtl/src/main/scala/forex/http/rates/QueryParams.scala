@@ -12,8 +12,8 @@ object QueryParams {
 
   def validateParams(p: Params): Either[ParseFailure,ValidatedParams] = {
     for {
-      from <- p.from.toRight(ParseFailure("failed to parse from", ""))
-      to <- p.to.toRight(ParseFailure("failed to parse to", ""))
+      from <- p.from.toRight(ParseFailure("Query parameter 'from' is not valid", "Query parameter 'from' is not valid"))
+      to <- p.to.toRight(ParseFailure("Query parameter 'to' is not valid", "Query parameter 'to' is not valid"))
     } yield new ValidatedParams(from, to)
   }
 
